@@ -25,7 +25,7 @@ def evaluate(dataset, model, args, name='Validation', max_num_examples=None):
     finaleval = ImgLevelResult(args)
     with torch.no_grad():
         test_time = args.test_epoch if (args.dynamic_graph and name !='Train')else 1
-        if args.full_test_graph:
+        if args.visualization:
             test_time = 1
         pred_n_times = []
         labels_n_time = []
@@ -35,7 +35,7 @@ def evaluate(dataset, model, args, name='Validation', max_num_examples=None):
             labels = []
             dataset.dataset.set_val_epoch(_)
             for batch_idx, data in enumerate(dataset):
-                if args.full_test_graph:
+                if args.visualization:
                     patch_idx = data['patch_idx']
                     patch_name = dataset.dataset.idxlist[patch_idx.item()]
                     adj = data['adj'].to(device)
@@ -80,16 +80,12 @@ def evaluate(dataset, model, args, name='Validation', max_num_examples=None):
             pred_n_times.append(preds[...,np.newaxis])
             labels_n_time.append(labels[...,np.newaxis])
 
-        if not args.full_test_graph and name !='Train':
-            pred_n_times = np.concatenate(pred_n_times, -1)
-            labels_n_time = np.hstack(labels_n_time)
-            pred_n_times = np.mean(pred_n_times,-1)
-            labels_n_time = np.mean(labels_n_time,-1)
-            pred_n_times = np.argmax(pred_n_times,1)
-        else:
-            pred_n_times = pred_n_times[0][...,0]
-            labels_n_time = labels_n_time[0][...,0]
-            pred_n_times = np.argmax(pred_n_times,1)
+        pred_n_times = np.concatenate(pred_n_times, -1)
+        labels_n_time = np.hstack(labels_n_time)
+        pred_n_times = np.mean(pred_n_times,-1)
+        labels_n_time = np.mean(labels_n_time,-1)
+        pred_n_times = np.argmax(pred_n_times,1)
+
     multi_class_acc,binary_acc = finaleval.final_result()
     result = { 'patch_acc': metrics.accuracy_score(labels_n_time,pred_n_times), 'img_acc':multi_class_acc, 'binary_acc': binary_acc }
     return result
@@ -179,18 +175,7 @@ def train(dataset, model, args,  val_dataset=None, test_dataset=None, writer=Non
             for batch_idx, data in enumerate(tqdm(dataset)):
                 train_iter += 40
                 begin_time = time.time()
-
-                if not args.load_data_list:
-                    # dense input
-                    adj = data['adj'].to(device)
-                    h0 = data['feats'].to(device)
-                    batch_num_nodes = data['num_nodes'].to(device)
-                    label = data['label'].to(device)
-                    label = label[:, 0]
-                    _, cls_loss = model((h0, adj, batch_num_nodes, label))
-                else:
-
-                    _, cls_loss = model(data)
+                _, cls_loss = model(data)
                 cls_loss = torch.mean(cls_loss)
                 loss =  cls_loss
                 optimizer.zero_grad()
@@ -270,7 +255,7 @@ def cell_graph(args, writer = None):
         input_dim, args.hidden_dim, args.output_dim, True, True, args.hidden_dim,  args.num_classes,
                                           args.assign_ratio,[50], concat= True,
                                           gcn_name= args.gcn_name,collect_assign=args.visualization,
-                                          load_data_sparse=(args.load_data_list) and not args.full_test_graph,
+                                          load_data_sparse=(args.load_data_list),
                                           norm_adj=args.norm_adj, activation=args.activation, drop_out=args.drop_out,
                                           jk=args.jump_knowledge,
                                           )
@@ -296,7 +281,7 @@ def cell_graph(args, writer = None):
         else:
             model = nn.DataParallel(model).cuda()
     else:
-        if args.load_data_list:
+        if args.load_data_list and not args.visualization:
             model = DataParallel(model).cuda()
         else:
             model = model.cuda()
@@ -308,7 +293,7 @@ def cell_graph(args, writer = None):
             _, val_accs = train(train_loader, model, args, val_dataset=val_loader, test_dataset=None,
             writer=writer, )
         print('finally: max_val_acc:%f'%max(val_accs))
-    _ = evaluate(val_loader, model, args, name='Validation', max_num_examples=None)
+    _ = evaluate(val_loader, model, args, name='Validation', max_num_examples=50)
     print(_)
 
 def arg_parse():
@@ -377,7 +362,7 @@ def arg_parse():
     parser.add_argument('--test_epoch', default=5,type= int)
     parser.add_argument('--sita', default=1.,type= float)
 
-    parser.add_argument('--full', dest='full_test_graph' , action='store_const',const=True, default=False,)
+
     parser.add_argument('--norm_adj',action='store_const', const=True, default=False,)
     parser.add_argument('--readout', default='max', type=str)
     parser.add_argument('--task', default= 'colon', type = str)

@@ -88,7 +88,7 @@ def prepare_train_val_loader(args):
         num_workers=args.num_workers, pin_memory=True
     )
 
-    if not args.full_test_graph:
+    if not args.visualization:
         test_dataset_loader = val_dataset_loader
     else:
         # this is for visualization test set
