@@ -11,4 +11,5 @@ class CrossValidSetting:
         self.log_path = os.path.join(self.save_path,'log' )
         self.result_path = os.path.join(self.save_path, 'result')
         self.dataset = ['shaban']
+        self.max_edge_distance = 100
         self.max_num_nodes = 11404 # the maximum number of nodes in one graph
