@@ -246,7 +246,7 @@ class NucleiDataset(Dataset):
         if self.dynamic_graph:
             data = torch.load(osp.join(self.processed_root, self.idxlist[idx]))
             num_nodes = data.num_nodes
-            dist_path = os.path.join(self.root, 'proto', 'distance','colorectal', self.idxlist[idx])
+            dist_path = os.path.join(self.root, 'proto', 'distance','shaban', self.idxlist[idx])
             choice, sample_num_node = self._sampling(num_nodes, self.sampling_ratio,dist_path)
             for key, item in data:
                 if torch.is_tensor(item) and item.size(0) == num_nodes:
@@ -350,7 +350,7 @@ class NucleiDatasetBatchOutput(NucleiDataset):
             data.x = data.x[:, :-2]
         if self.dynamic_graph:
             num_nodes = data.num_nodes
-            dist_path = os.path.join(self.root, 'proto', 'distance', 'colorectal', self.idxlist[idx])
+            dist_path = os.path.join(self.root, 'proto', 'distance', 'shaban', self.idxlist[idx])
             choice, _ = self._sampling(num_nodes, self.sampling_ratio, dist_path)
             for key, item in data:
                 if torch.is_tensor(item) and item.size(0) == num_nodes:

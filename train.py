@@ -286,8 +286,8 @@ def cell_graph(args, writer = None):
             resume_file = 'weight.pth.tar'
             resume_path = os.path.join(args.resultdir, gen_prefix(args), resume_file)
         else:#'/media/amanda/HDD2T_1/warwick-research/experiment/gcnn/result'
-            # resume_path  =  os.path.join(args.resultdir,args.resume,'model_best.pth.tar')
-            resume_path = os.path.join('/media/amanda/HDD2T_1/warwick-research/experiment/gcnn/result', args.resume, 'model_best.pth.tar')
+            resume_path  =  os.path.join(args.resultdir,args.resume,'model_best.pth.tar')
+            # resume_path = os.path.join('/media/amanda/HDD2T_1/warwick-research/experiment/gcnn/result', args.resume, 'model_best.pth.tar')
         checkpoint = load_checkpoint(resume_path)
         model.load_state_dict(checkpoint['state_dict'])
 
@@ -431,18 +431,18 @@ def main():
     log_path = os.path.join(prog_args.logdir, gen_prefix(prog_args))
     result_path = os.path.join(prog_args.resultdir , gen_prefix(prog_args))
     cell_graph(prog_args)
-    # mkdirs(log_path)
-    # mkdirs(result_path)
-    # if prog_args.visualization:
-    #     visual_path = os.path.join(prog_args.resultdir, gen_prefix(prog_args), 'visual')
-    #     mkdirs(visual_path)
-    # if not prog_args.skip_train:
-    #     with open(os.path.join(result_path,'args.txt'), 'w') as f:
-    #         json.dump(prog_args.__dict__, f, indent=2)
-    #
-    # writer = SummaryWriter(log_path)
-    # cell_graph(prog_args, writer=writer, )
-    # writer.close()
+    mkdirs(log_path)
+    mkdirs(result_path)
+    if prog_args.visualization:
+        visual_path = os.path.join(prog_args.resultdir, gen_prefix(prog_args), 'visual')
+        mkdirs(visual_path)
+    if not prog_args.skip_train:
+        with open(os.path.join(result_path,'args.txt'), 'w') as f:
+            json.dump(prog_args.__dict__, f, indent=2)
+
+    writer = SummaryWriter(log_path)
+    cell_graph(prog_args, writer=writer, )
+    writer.close()
 
 if __name__ == "__main__":
     torch.multiprocessing.set_sharing_strategy('file_system')
