@@ -13,7 +13,7 @@ A histology image (a) is typically broken into small image patches (b) for cance
 -   Other packages in requirements.txt
 
 ## Usage
-prerequisite: your dataset images and cell/nuclei instance masks 
+Prerequisite: dataset images and cell/nuclei instance masks 
 1. Clone the repository and set up the folders in the following structure:
 ```
  ├── code                   
