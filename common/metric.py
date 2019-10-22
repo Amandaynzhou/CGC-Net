@@ -148,13 +148,12 @@ GROUND_TRUTH = {
 ]
 
 }
-
 class ImgLevelResult(object):
     def __init__(self, args):
         self.args = args
         self.imglist = {}
         for name in GROUND_TRUTH[CROSS_VAL[args.cross_val]]:
-
+            # get the ground truth label: noral-0, low-level:1, high-level:2
             self.imglist[name.split('_grade')[0]] = int(name.split('_')[-1])-1
         self.prediction = defaultdict(list)
 

@@ -1,7 +1,5 @@
 import torch
 from torch_geometric.utils import scatter_
-
-
 def to_dense_adj(edge_index, batch=None, edge_attr=None):
     r"""Converts batched sparse adjacency matrices given by edge indices and
     edge attributes to a single dense batched adjacency matrix.
