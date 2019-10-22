@@ -260,7 +260,7 @@ def train(dataset, model, args,  val_dataset=None, test_dataset=None, writer=Non
 
 def cell_graph(args, writer = None):
     # val==test loader since we do cross-val
-    pdb.set_trace()
+
     train_loader, val_loader, test_loader = prepare_train_val_loader(args)
     setting = DataSetting()
     input_dim = args.input_feature_dim
@@ -274,7 +274,7 @@ def cell_graph(args, writer = None):
                                           norm_adj=args.norm_adj, activation=args.activation, drop_out=args.drop_out,
                                           jk=args.jump_knowledge,
                                           )
-    pdb.set_trace()
+
     if(args.resume):
         if args.resume == 'best':
             resume_file = 'model_best.pth.tar'
@@ -296,7 +296,10 @@ def cell_graph(args, writer = None):
         else:
             model = nn.DataParallel(model).cuda()
     else:
-        model = DataParallel(model).cuda()
+        if args.load_data_list:
+            model = DataParallel(model).cuda()
+        else:
+            model = model.cuda()
     if not args.skip_train:
         if args.resume:
             _, val_accs = train(train_loader, model, args, val_dataset=val_loader, test_dataset=None,
