@@ -7,7 +7,7 @@ class CrossValidSetting:
         self.sample_time = 1
         self.sample_ratio = 1
         self.root = '/research/dept6/ynzhou/gcnn/data'#'path-to-the-data'#'/research/dept6/ynzhou/gcnn/data'
-        self.save_path = '/research/dept6/ynzhou/gcnn/experiment/gcnn-crossval'
+        self.save_path = '/research/dept6/ynzhou/gcnn/experiment/gcnn'
         self.log_path = os.path.join(self.save_path,'log' )
         self.result_path = os.path.join(self.save_path, 'result')
         self.dataset = ['shaban']
