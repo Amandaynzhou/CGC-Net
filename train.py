@@ -179,11 +179,8 @@ def train(dataset, model, args,  val_dataset=None, test_dataset=None, writer=Non
             for batch_idx, data in enumerate(tqdm(dataset)):
                 train_iter += 40
                 begin_time = time.time()
-                if args.load_data_sparse:
-                    for key, item in data:
-                        data[key] = data[key].to(device)
-                    _,  cls_loss = model(data)
-                elif not args.load_data_list:
+
+                if not args.load_data_list:
                     # dense input
                     adj = data['adj'].to(device)
                     h0 = data['feats'].to(device)
@@ -299,7 +296,7 @@ def cell_graph(args, writer = None):
         else:
             model = nn.DataParallel(model).cuda()
     else:
-        model = model.cuda()
+        model = DataParallel(model).cuda()
     if not args.skip_train:
         if args.resume:
             _, val_accs = train(train_loader, model, args, val_dataset=val_loader, test_dataset=None,
