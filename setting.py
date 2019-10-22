@@ -11,4 +11,4 @@ class CrossValidSetting:
         self.log_path = os.path.join(self.save_path,'log' )
         self.result_path = os.path.join(self.save_path, 'result')
         self.dataset = ['colonrectal']
-        self.max_num_nodes = 15615 # the maximum number of nodes in one graph
+        self.max_num_nodes = 11404 # the maximum number of nodes in one graph

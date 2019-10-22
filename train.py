@@ -101,10 +101,7 @@ def gen_prefix(args):
     if args.method == 'soft-assign':
         name += '_l' + str(args.num_gc_layers) + 'x' + str(args.num_pool)
         name += '_ar' + str(int(args.assign_ratio*100))
-        if args.linkpred:
-            name += '_lp'
-        if args.balanced_cluster:
-            name += '_bl' +str(float(args.sita))
+
     name += '_h' + str(args.hidden_dim) + '_o' + str(args.output_dim)
     if not args.bias:
         name += '_nobias'
@@ -266,6 +263,7 @@ def train(dataset, model, args,  val_dataset=None, test_dataset=None, writer=Non
 
 def cell_graph(args, writer = None):
     # val==test loader since we do cross-val
+    pdb.set_trace()
     train_loader, val_loader, test_loader = prepare_train_val_loader(args)
     setting = DataSetting()
     input_dim = args.input_feature_dim
@@ -279,7 +277,7 @@ def cell_graph(args, writer = None):
                                           norm_adj=args.norm_adj, activation=args.activation, drop_out=args.drop_out,
                                           jk=args.jump_knowledge,
                                           )
-
+    pdb.set_trace()
     if(args.resume):
         if args.resume == 'best':
             resume_file = 'model_best.pth.tar'
@@ -287,8 +285,9 @@ def cell_graph(args, writer = None):
         elif args.resume == 'weight':
             resume_file = 'weight.pth.tar'
             resume_path = os.path.join(args.resultdir, gen_prefix(args), resume_file)
-        else:
-            resume_path  =  os.path.join(args.resultdir,args.resume,'model_best.pth.tar')
+        else:#'/media/amanda/HDD2T_1/warwick-research/experiment/gcnn/result'
+            # resume_path  =  os.path.join(args.resultdir,args.resume,'model_best.pth.tar')
+            resume_path = os.path.join('/media/amanda/HDD2T_1/warwick-research/experiment/gcnn/result', args.resume, 'model_best.pth.tar')
         checkpoint = load_checkpoint(resume_path)
         model.load_state_dict(checkpoint['state_dict'])
 
@@ -431,18 +430,19 @@ def main():
     torch.backends.cudnn.benchmark = True
     log_path = os.path.join(prog_args.logdir, gen_prefix(prog_args))
     result_path = os.path.join(prog_args.resultdir , gen_prefix(prog_args))
-    mkdirs(log_path)
-    mkdirs(result_path)
-    if prog_args.visualization:
-        visual_path = os.path.join(prog_args.resultdir, gen_prefix(prog_args), 'visual')
-        mkdirs(visual_path)
-    if not prog_args.skip_train:
-        with open(os.path.join(result_path,'args.txt'), 'w') as f:
-            json.dump(prog_args.__dict__, f, indent=2)
-
-    writer = SummaryWriter(log_path)
-    cell_graph(prog_args, writer=writer, )
-    writer.close()
+    cell_graph(prog_args)
+    # mkdirs(log_path)
+    # mkdirs(result_path)
+    # if prog_args.visualization:
+    #     visual_path = os.path.join(prog_args.resultdir, gen_prefix(prog_args), 'visual')
+    #     mkdirs(visual_path)
+    # if not prog_args.skip_train:
+    #     with open(os.path.join(result_path,'args.txt'), 'w') as f:
+    #         json.dump(prog_args.__dict__, f, indent=2)
+    #
+    # writer = SummaryWriter(log_path)
+    # cell_graph(prog_args, writer=writer, )
+    # writer.close()
 
 if __name__ == "__main__":
     torch.multiprocessing.set_sharing_strategy('file_system')

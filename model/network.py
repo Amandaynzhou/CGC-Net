@@ -140,7 +140,6 @@ class SoftPoolingGcnEncoder(nn.Module):
         self.collect_assign = collect_assign
         self.assign_matrix = []
         assign_dim = int(max_num_nodes * assign_ratio)
-        assign_dim = int(max_num_nodes * assign_ratio)
         self.GCN_embed_1 = GNN_Module(input_dim, hidden_dim, embedding_dim, bias, bn,
                                       add_loop= False, lin=False, gcn_name=gcn_name,activation=activation, jk = jk)
         if jk:
