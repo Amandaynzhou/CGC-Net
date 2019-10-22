@@ -56,8 +56,7 @@ def prepare_train_val_loader(args):
         sampling_ratio=args.sample_ratio,
         normalize=args.normalize, dynamic_graph=args.dynamic_graph,
         sampling_method=args.sampling_method,
-        # sampling_by_number = args.sampling_by_number,
-        datasetting=setting, mask=args.mask,
+        datasetting=setting,
         neighbour=args.neighbour,
         graph_sampler=args.graph_sampler,
         crossval=args.cross_val),
@@ -75,9 +74,7 @@ def prepare_train_val_loader(args):
                                         normalize=args.normalize,
                                         dynamic_graph=args.dynamic_graph,
                                         sampling_method=args.sampling_method,
-                                        # sampling_by_number=args.sampling_by_number,
                                         datasetting=setting,
-                                        mask=args.mask,
                                         neighbour=args.neighbour,
                                         graph_sampler=args.graph_sampler, crossval=args.cross_val)
 
@@ -95,14 +92,9 @@ def prepare_train_val_loader(args):
         testset = NucleiDatasetTest(root=setting.root,
                                     feature_type=args.feature_type,
                                     split='valid',
-                                    sampling_time=1,
-                                    sampling_ratio=1,
                                     normalize=args.normalize,
-                                    dynamic_graph=args.dynamic_graph,
                                     sampling_method=args.sampling_method,
-                                    # sampling_by_number=args.sampling_by_number,
                                     datasetting=setting,
-                                    mask=args.mask,
                                     neighbour=args.neighbour,
                                     graph_sampler=args.graph_sampler,
                                     crossval=args.cross_val)
@@ -120,14 +112,13 @@ class NucleiDataset(Dataset):
 
     def __init__(self, root,  feature_type, transform=None, pre_transform=None, split = 'train',
                  sampling_time = 10, sampling_ratio = 0.5, normalize = False, dynamic_graph = False, sampling_method = 'farthest',
-                datasetting = None, mask = 'CIA',neighbour = 8, graph_sampler = 'knn',crossval = 1):
+                datasetting = None,neighbour = 8, graph_sampler = 'knn',crossval = 1):
         super(NucleiDataset, self).__init__( root, transform, pre_transform)
         setting = datasetting#DataSetting()
         self.epoch = 0
         self.val_epoch = 0
         self.graph_sampler = graph_sampler
         self.task = setting.name
-        self.mask = mask
         self.setting = setting
 
         self.dynamic_graph = dynamic_graph
@@ -202,8 +193,7 @@ class NucleiDataset(Dataset):
         pass
 
     def _sampling(self, num_sample, ratio, distance_path = None):
-        if self.mask == 'hvnet':
-            distance_path = distance_path.replace('distance','distance_s')
+
         if self.sampling_by_ratio:
             num_subsample = int(num_sample * ratio)
             if self.task != 'colon':
@@ -246,7 +236,7 @@ class NucleiDataset(Dataset):
         if self.dynamic_graph:
             data = torch.load(osp.join(self.processed_root, self.idxlist[idx]))
             num_nodes = data.num_nodes
-            dist_path = os.path.join(self.root, 'proto', 'distance','shaban', self.idxlist[idx])
+            dist_path = os.path.join(self.root, 'proto', 'distance',self.setting.dataset, self.idxlist[idx])
             choice, sample_num_node = self._sampling(num_nodes, self.sampling_ratio,dist_path)
             for key, item in data:
                 if torch.is_tensor(item) and item.size(0) == num_nodes:
@@ -290,15 +280,15 @@ class NucleiDataset(Dataset):
 
 class NucleiDatasetTest(NucleiDataset):
     def __init__(self, root, feature_type, transform=None, pre_transform=None, split = 'train',
-                 sampling_time=1, sampling_ratio=1, normalize=False, dynamic_graph=False,
-                 sampling_method='farthest', datasetting = None, mask = 'CIA',
+                 normalize=False,
+                 sampling_method='farthest', datasetting = None,
                  neighbour = 8, graph_sampler = 'knn',crossval = 1):
         super(NucleiDatasetTest, self).__init__(root, feature_type, transform=transform,
                                                        pre_transform=pre_transform, split = split,
                                                        sampling_time=1, sampling_ratio=1,
                                                        normalize=normalize, dynamic_graph=False,
                                                        sampling_method=sampling_method,
-                                                       datasetting = datasetting,mask=mask,neighbour=neighbour,graph_sampler =graph_sampler,crossval=crossval )
+                                                       datasetting = datasetting,neighbour=neighbour,graph_sampler =graph_sampler,crossval=crossval )
     def get(self, idx):
         # only support batch size = 1
         data = torch.load(osp.join(self.processed_root, self.idxlist[idx]))
@@ -331,14 +321,13 @@ class NucleiDatasetTest(NucleiDataset):
 class NucleiDatasetBatchOutput(NucleiDataset):
     def __init__(self, root, feature_type, transform=None, pre_transform=None, split = 'train',
                  sampling_time=10, sampling_ratio=0.5, normalize=False, dynamic_graph = False, sampling_method = 'farthest',
-                 datasetting = None, mask = 'CIA',neighbour = 8,graph_sampler ='knn',crossval = 1):
+                 datasetting = None,neighbour = 8,graph_sampler ='knn',crossval = 1):
         super(NucleiDatasetBatchOutput, self).__init__( root, feature_type, transform=transform, pre_transform=pre_transform, split = split,
                  sampling_time=sampling_time, sampling_ratio=sampling_ratio, normalize=normalize, dynamic_graph=dynamic_graph, sampling_method  = sampling_method
-                                                        ,datasetting=datasetting,mask=mask,neighbour=neighbour,
+                                                        ,datasetting=datasetting,neighbour=neighbour,
                                                         graph_sampler =graph_sampler,crossval = crossval )
 
     def get(self, idx):
-        name = self.idxlist[idx].split('/')[-1]
         epoch = self.epoch if self.split=='train' else self.val_epoch
         if self.dynamic_graph:
             data = torch.load(osp.join(self.processed_root, self.idxlist[idx]))
@@ -350,7 +339,7 @@ class NucleiDatasetBatchOutput(NucleiDataset):
             data.x = data.x[:, :-2]
         if self.dynamic_graph:
             num_nodes = data.num_nodes
-            dist_path = os.path.join(self.root, 'proto', 'distance', 'shaban', self.idxlist[idx])
+            dist_path = os.path.join(self.root, 'proto', 'distance', self.setting.dataset, self.idxlist[idx])
             choice, _ = self._sampling(num_nodes, self.sampling_ratio, dist_path)
             for key, item in data:
                 if torch.is_tensor(item) and item.size(0) == num_nodes:
