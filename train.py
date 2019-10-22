@@ -293,7 +293,7 @@ def cell_graph(args, writer = None):
             _, val_accs = train(train_loader, model, args, val_dataset=val_loader, test_dataset=None,
             writer=writer, )
         print('finally: max_val_acc:%f'%max(val_accs))
-    _ = evaluate(test_loader, model, args, name='Validation', max_num_examples=50)
+    _ = evaluate(test_loader, model, args, name='Validation', max_num_examples=None)
     print(_)
 
 def arg_parse():
