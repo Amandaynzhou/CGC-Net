@@ -71,7 +71,7 @@ def evaluate(dataset, model, args, name='Validation', max_num_examples=None):
                     assign_matrix_list = [f.detach().cpu().numpy() for f in model.assign_matrix]
 
                     for i in range(adj.shape[0]):
-                        save_name = os.path.join(args.resultdir,gen_prefix(args),'visual', name[i] + '.gexf')
+                        save_name = os.path.join(args.resultdir,gen_prefix(args),'visual', name[i].split('/') + '.gexf')
                         assign_matrix_list_single_image = [f[i] for f in assign_matrix_list]
                         output_to_gexf( h0[i], adj[i], assign_matrix_list_single_image, save_name)
 
