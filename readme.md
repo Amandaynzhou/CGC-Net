@@ -2,8 +2,10 @@
 by Yanning Zhou, Simon Graham, Navid Alemi Koohbanani, Muhammad Shaban, Pheng-Ann Heng and Nasir Rajpoot.
 
 ## Introduction
-This repository is for our ICCVW2019 paper 'CGC-Net: Cell Graph Convolutional Network for Grading of Colorectal Cancer Histology Images'.
+This repository is for our ICCVW2019 paper [CGC-Net: Cell Graph Convolutional Network for Grading of Colorectal Cancer Histology Images](https://arxiv.org/abs/1909.01068).
 
+![cellgraph](./images/top.png)
+A histology image (a) is typically broken into small image patches (b) for cancer grading. We propose to utilise the cell graph (d) that is built from individual nuclei after segmentation (c) to model the entire tissue micro-environment for cancer grading.
 ## Requirements
 -   python 3.6.1
 -   torch 1.1.0
