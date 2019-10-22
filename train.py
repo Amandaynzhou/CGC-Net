@@ -255,7 +255,7 @@ def cell_graph(args, writer = None):
         input_dim, args.hidden_dim, args.output_dim, True, True, args.hidden_dim,  args.num_classes,
                                           args.assign_ratio,[50], concat= True,
                                           gcn_name= args.gcn_name,collect_assign=args.visualization,
-                                          load_data_sparse=(args.load_data_list),
+                                          load_data_sparse=(args.load_data_list and not args.visualization),
                                           norm_adj=args.norm_adj, activation=args.activation, drop_out=args.drop_out,
                                           jk=args.jump_knowledge,
                                           )
