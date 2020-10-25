@@ -145,7 +145,7 @@ if __name__ == '__main__':
     for f in folds:
 
         for j in range(epoch):
-            mkdirs(osp.join(processed_dir, '%d' % epoch, f))
+            mkdirs(osp.join(processed_dir, '%d' % j, f))
 
     p = Pool(32)
     arr = p.map(gen,original_files )
