@@ -34,7 +34,7 @@ def evaluate(dataset, model, args, name='Validation', max_num_examples=None):
             preds = []
             labels = []
             dataset.dataset.set_val_epoch(_)
-            for batch_idx, data in enumerate(dataset):
+            for batch_idx, data in enumerate(dataset.dataset):
                 if args.visualization:
                     patch_idx = data['patch_idx']
                     patch_name = dataset.dataset.idxlist[patch_idx.item()]
